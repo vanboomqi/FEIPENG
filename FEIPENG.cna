@@ -1,6 +1,6 @@
 popup beacon_bottom {
   separator();
-  menu "FEIPENG"{
+  menu "飞蓬"{
     include(script_resource("modules/InfoCollect.cna"));
     include(script_resource("modules/IntrScan.cna"));
     include(script_resource("modules/IntrAgent.cna"));
