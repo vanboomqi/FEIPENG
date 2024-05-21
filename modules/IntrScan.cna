@@ -2,7 +2,7 @@ include(script_resource("config.cna"));
 
 menu "☆ 内网扫描" {
 
-    item "运行 Fscan" {
+    item "Fscan" {
         blog($1, "\c9=========== 运行 Fscan ==========");
         $bid = $1['@'];
         btask($bid, "fscan.exe -h 192.168.1.1/24 -np -no -nopoc                     (跳过存活检测、不保存文件、跳过web poc扫描)", "");            
