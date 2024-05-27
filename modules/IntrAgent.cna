@@ -22,7 +22,7 @@ sub run_frp {
     $protocol = $3['protocol'];
 
     # 创建配置文件内容
-    $config = "[common]\nserver_addr = $ip\nserver_port = $port\nprotocol = $protocol\n\n[socks5_proxy]\ntype = tcp\nremote_port = $socks5_port\nplugin = socks5\n";
+    $config = "[common]\nserver_addr = $ip\nserver_port = $port\nprotocol = $protocol\n\n[socks5_proxy]\ntype = tcp\nremote_port = $socks5_port\nplugin = socks5\n\nuse_encryption = true\nuse_compression = true";
 
     # 将配置文件内容转换为 Base64
     $base64Config = base64_encode($config);
