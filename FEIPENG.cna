@@ -10,8 +10,6 @@ popup beacon_bottom {
     include(script_resource("modules/RemoteLogin.cna"));
     include(script_resource("modules/LateMovement.cna"));
     include(script_resource("modules/TraceClean.cna"));
-    include(script_resource("modules/BypassCxk.cna"));
-    include(script_resource("modules/HavingFun.cna"));
   }
   separator();
 }

