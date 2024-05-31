@@ -1,10 +1,18 @@
 menu "☆ 信息收集" {
 	menu "工作组常用命令" {
+		menu "查看操作系统信息"{
 		item "systeminfo" {
-			blog($1, "\c9=========== systeminfo ==========");
+			blog($1, "\c9=========== 查看操作系统信息 ==========");
 			$bid = $1['@'];
 			bshell($bid, "systeminfo");
 		}
+		item "wmic" {
+			blog($1, "\c9=========== 查看操作系统信息 ==========");
+			$bid = $1['@'];
+			bshell($bid, "wmic OS get Caption,CSDVersion,OSArchitecture,Version");
+		}
+		}
+
 		item "whoami /all" {
 			blog($1, "\c9=========== whoami /all ==========");
 			$bid = $1['@'];
@@ -38,12 +46,39 @@ menu "☆ 信息收集" {
 				blog($1, "\c9=========== Tracert 路由跟踪 ==========");
 				prompt_text("需要跟踪的ip或域名：", "", lambda({ bshell(@ids, "tracert $1");  }, @ids => $1));
 			}		
-		}	
-		item "查看用户信息" {
+			item "获取出网IP" {
+				blog($1, "\c9=========== 获取出网IP ==========");
+				bshell($1, "curl ident.me");
+			}				
+		}
+		menu "查看用户信息"	{
+			item "net user" {
 			blog($1, "\c9=========== 查看用户信息 ==========");
 			$bid = $1['@'];
 			bshell($bid, "net user");
-		}		
+			}
+			item "powershell" {
+			blog($1, "\c9=========== 查看用户信息 ==========");
+			$bid = $1['@'];
+			bpowerpick($1, "Get-WmiObject -Class Win32_UserAccount");
+			}	
+			item "当前系统内所有用户+SID"{
+			blog($1, "\c9=========== 当前系统内所有用户+SID ==========");
+			$bid = $1['@'];
+			bshell($bid, "wmic useraccount get name,sid");
+			}
+			item "查看本地管理员组（通常包含域用户）"{
+			blog($1, "\c9=========== 查看本地管理员组（通常包含域用户） ==========");
+			$bid = $1['@'];
+			bshell($bid, "net localgroup administrators");
+			}
+			
+		}
+		item "查看系统盘符" {
+			blog($1, "\c9=========== 查看系统盘符 ==========");
+			$bid = $1['@'];
+			bshell($bid, "wmic logicaldisk where DriveType=3 get DeviceID");
+		}			
 		item "查看安装程序和版本信息" {
 			blog($1, "\c9=========== 查看安装程序和版本信息 ==========");
 			$bid = $1['@'];
