@@ -7,7 +7,7 @@
 ## 功能
 
 - 集成多种 PowerShell 脚本和 C# 程序
-- 支持不落地执行，增强隐蔽性（如 frp, fscan）
+- 支持不落地执行，增强隐蔽性（如 frp, fscan, HackBrowserData）
 - 通过远程加载 DLL 实现高效部署
 - 便于在 Cobalt Strike 中快速使用
 
@@ -21,6 +21,34 @@
     # config 文件示例
     $url = "http://example.com";
     ```
+
+3. **远程加载 DLL 模块**：飞蓬插件包含多个远程加载 DLL 模块，如 frp、fscan 和 HackBrowserData。
+
+## 兼容性
+
+远程加载 DLL 模块兼容以下操作系统：
+
+- Windows 7
+- Windows 10
+- Windows 11
+- Windows Server 2012
+- Windows Server 2016
+- Windows Server 2019
+- Windows Server 2022
+
+### 系统要求
+
+- 加载器最低要求 .NET Framework 3.5。
+
+### Windows 7 注意事项
+
+在 Windows 7 上使用时，可能会遇到以下错误：
+
+Attempting to enable TLS 1.2... 
+
+Error enabling TLS 1.2: 不支持请求的安全协议。
+
+这是由于 Windows 7 未更新补丁导致不支持 TLS 1.2。解决方法是将网页服务设置为最低支持 TLS 1.0 即可正常使用。
 
 ## 参考
 
