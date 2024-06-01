@@ -79,6 +79,11 @@ menu "☆ 信息收集" {
 			$bid = $1['@'];
 			bshell($bid, "wmic logicaldisk where DriveType=3 get DeviceID");
 		}			
+		item "获取.net&&powershell版本"{
+		blog($1, "\c9=========== 获取.net&&powershell版本 ==========");
+		$bid = $1['@'];
+		bexecute_assembly($1, script_resource('/scripts/InfoCollect//Ladon.exe'), "NetVer");
+		}
 		item "查看安装程序和版本信息" {
 			blog($1, "\c9=========== 查看安装程序和版本信息 ==========");
 			$bid = $1['@'];
