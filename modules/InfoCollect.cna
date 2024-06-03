@@ -134,6 +134,13 @@ menu "☆ 信息收集" {
 			$bid = $1['@'];
 			bshell($bid, "query user || qwinsta");
 		}
+		item "WIN10检查UAC" {
+			blog($1, "\c9=========== WIN10检查UAC ==========");
+			blog($1, "\c9=========== 打开=0x1 ==========");
+			blog($1, "\c9=========== 关闭=0x0 ==========");
+			$bid = $1['@'];
+			bshell($bid, "reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System\" /v EnableLUA");
+		}
 		item "查看开机时间" {
 			blog($1, "\c9=========== 查看开机时间 ==========");
 			$bid = $1['@'];
@@ -1027,6 +1034,13 @@ menu "☆ 信息收集" {
 				
 			}
 
+		}
+		item "360检查核晶" {
+		blog($1, "\c9=========== 360检查核晶 ==========");
+		blog($1, "\c9=========== 打开=0x1 ==========");
+		blog($1, "\c9=========== 关闭=没有此项 或 其他 ==========");
+		bshell($1,"reg query \"HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\services\\360Hvm\" /v Start");
+		bshell($1,"reg query \"HKLM\\System\\CurrentControlSet\\services\\360Hvm\" /v WorkConfig");
 		}
 	}
 	item "Check VM（虚拟机检测）" {
